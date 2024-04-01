@@ -1,20 +1,58 @@
-import React, { useState, useEffect } from "react";
-import { Pedometer } from "expo-sensors";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View,
+  Button,
+  Image,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Alert,
+} from "react-native";
+import { Camera } from "expo-camera";
+import * as Sharing from "expo-sharing";
 import auth from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 
 export default function Dashboard() {
-  const [currentStepCount, setCurrentStepCount] = useState(0);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [type, setType] = useState(Camera.Constants.Type.back);
+  const [photo, setPhoto] = useState(null);
+  const cameraRef = useRef(null);
   const navigation = useNavigation();
 
   useEffect(() => {
-    const subscribe = Pedometer.watchStepCount((result) => {
-      setCurrentStepCount(result.steps);
-    });
-
-    return () => subscribe.remove();
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setHasPermission(status === "granted");
+    })();
   }, []);
+
+  const takePhoto = async () => {
+    if (cameraRef.current) {
+      const { uri } = await cameraRef.current.takePictureAsync();
+      setPhoto(uri);
+    }
+  };
+
+  const sharePhoto = async () => {
+    try {
+      if (!photo) return;
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (isAvailable) {
+        await Sharing.shareAsync(photo);
+      } else {
+        Alert.alert(
+          "Teilen nicht verfügbar",
+          "Das Teilen ist auf diesem Gerät nicht möglich."
+        );
+      }
+    } catch (error) {
+      Alert.alert(
+        "Fehler beim Teilen",
+        "Beim Teilen des Fotos ist ein Fehler aufgetreten."
+      );
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -24,39 +62,63 @@ export default function Dashboard() {
         routes: [{ name: "Login" }],
       });
     } catch (error) {
-      console.log("ERROR during Logout: ", error);
+      Alert.alert(
+        "Fehler beim Ausloggen",
+        "Beim Ausloggen ist ein Fehler aufgetreten."
+      );
     }
   };
 
+  if (hasPermission === false) {
+    return <Text>Kein Zugriff auf die Kamera.</Text>;
+  }
+
   return (
-    <View style={{ flex: 1, padding: 10, backgroundColor: "#BEBDB8" }}>
-      <Text
-        style={{
-          fontSize: 32,
-          fontWeight: "bold",
-          marginBottom: 40,
-          marginTop: 150,
-        }}
-      >
-        Willkommen im Dashboard
-      </Text>
-      <Text style={{ fontSize: 22, marginBottom: 20 }}>
-        Schritte heute: {currentStepCount}
-      </Text>
-      <TouchableOpacity
-        onPress={handleLogout}
-        style={{
-          backgroundColor: "#841584",
-          padding: 10,
-          borderRadius: 5,
-          marginBottom: 20,
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ color: "white", fontSize: 22, fontWeight: "bold" }}>
-          Logout
-        </Text>
-      </TouchableOpacity>
+    <View style={styles.container}>
+      <Camera style={styles.camera} type={type} ref={cameraRef}>
+        <TouchableOpacity onPress={takePhoto} style={styles.captureButton}>
+          <Text style={styles.captureButtonText}>Foto aufnehmen</Text>
+        </TouchableOpacity>
+      </Camera>
+      {photo && (
+        <View style={styles.photoPreviewContainer}>
+          <Image source={{ uri: photo }} style={styles.photoPreview} />
+          <Button title="Teilen" onPress={sharePhoto} />
+        </View>
+      )}
+      <Button title="Logout" onPress={handleLogout} color="#841584" />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  camera: {
+    flex: 3,
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  captureButton: {
+    alignSelf: "center",
+    marginBottom: 20,
+    padding: 15,
+    backgroundColor: "#fff",
+    borderRadius: 40,
+  },
+  captureButtonText: {
+    fontSize: 18,
+    color: "#000",
+  },
+  photoPreviewContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  photoPreview: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+});

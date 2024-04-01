@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "797747284999",
+    "project_id": "m335-project-7bcef",
+    "storage_bucket": "m335-project-7bcef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797747284999:android:69566c186e19590a79aea2",
+        "android_client_info": {
+          "package_name": "com.sathanan.M335project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDo7hdbl-VruQuhQSZXts_u2fFo_l-s4pg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

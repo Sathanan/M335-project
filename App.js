@@ -6,7 +6,6 @@ import Login from "./src/Login.js";
 import Detail from "./src/Detail.js";
 import Dashboard from "./src/Dashboard.js";
 
-
 const Stack = createStackNavigator();
 
 export default function App() {

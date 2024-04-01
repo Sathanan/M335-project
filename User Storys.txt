@@ -1,0 +1,10 @@
+User Storys:
+------------
+
+- Als neuer Nutzer möchte ich meine Handynummer eingeben können, um mich in der App zu registrieren und meine Identität zu verifizieren.
+
+- Als neuer Nutzer möchte ich nach der Authentifizierung meine persönlichen Details wie Name, Geburtsdatum und Geschlecht eingeben können, um mein Profil zu vervollständigen.
+
+- Als Nutzer möchte ich die Kamerafunktionalität nutzen können, um ein Snapshot zu teilen.
+
+-Als registrierter Nutzer möchte ich mich aus der App ausloggen können, um meine Sitzung zu beenden und meine Daten zu schützen.
